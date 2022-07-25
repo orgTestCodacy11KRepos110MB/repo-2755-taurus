@@ -8,14 +8,14 @@ ENV PIP_INSTALL="python3 -m pip install"
 
 RUN apt-get update && apt install software-properties-common -y && add-apt-repository ppa:deadsnakes/ppa -y && apt-get update
 
-ADD https://deb.nodesource.com/setup_12.x /tmp
+ADD https://deb.nodesource.com/setup_lts.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
 ADD https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb /tmp
 COPY dist/bzt*whl /tmp
 
 WORKDIR /tmp
 # add node repo and call 'apt-get update'
-RUN bash ./setup_12.x \
+RUN bash ./setup_lts.x \
    && $APT_INSTALL build-essential python3-pip python3.9
 
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
