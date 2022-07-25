@@ -18,7 +18,7 @@ WORKDIR /tmp
 RUN bash ./setup_lts.x \
    && $APT_INSTALL build-essential python3-pip python3.9
 
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+#RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 
 # install python packages..
 RUN $PIP_INSTALL ./bzt*whl chardet
