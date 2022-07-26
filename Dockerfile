@@ -2,12 +2,13 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
+ENV APT_ADD_REPO="add-apt-repository -y"
 ENV APT_INSTALL="apt-get -y install --no-install-recommends"
+ENV APT_LIGHT_INSTALL="apt -y install"
 ENV APT_UPDATE="apt-get -y update"
 ENV PIP_INSTALL="python3 -m pip install"
 
-
-RUN apt-get update && apt install software-properties-common -y && add-apt-repository ppa:deadsnakes/ppa -y && add-apt-repository ppa:mozillateam/ppa && apt-get update
+RUN $APT_UPDATE && $APT_LIGHT_INSTALL software-properties-common && $APT_ADD_REPO ppa:deadsnakes/ppa && add-apt-repository ppa:mozillateam/ppa && $APT_UPDATE
 
 RUN $APT_INSTALL -t 'o=LP-PPA-mozillateam' firefox
 
@@ -15,6 +16,7 @@ ADD https://deb.nodesource.com/setup_lts.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
 ADD https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb /tmp
 COPY dist/bzt*whl /tmp
+COPY requirements.txt /tmp
 
 WORKDIR /tmp
 RUN $APT_UPDATE && $APT_INSTALL \
@@ -26,6 +28,7 @@ RUN bash ./setup_lts.x \
    && $APT_INSTALL build-essential python3-pip python3.9 python3.9-distutils
 
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+RUN $PIP_INSTALL --upgrade --force-reinstall -r requirements.txt
 
 # install python packages..
 RUN $PIP_INSTALL ./bzt*whl chardet
@@ -69,6 +72,9 @@ RUN mkdir -p /etc/bzt.d \
     /opt/google/chrome/google-chrome \
   && bzt -install-tools -v \
   && google-chrome-stable --version && firefox --version && dotnet --version | head -1
+
+RUN bzt -install-tools -v
+RUN google-chrome-stable --version && firefox --version && dotnet --version | head -1
 
 RUN rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/* \
