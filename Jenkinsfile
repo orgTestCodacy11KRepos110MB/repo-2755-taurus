@@ -2,14 +2,11 @@
 
 pipeline {
     agent {
-/*
         dockerfile {
             label 'google'
             filename 'tests/ci/Dockerfile'
             args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
         }
-*/
-        docker{ image 'ubuntu:22.04'}
     }
     options {
         timestamps()

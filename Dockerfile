@@ -11,7 +11,7 @@ RUN apt-get update && apt install software-properties-common -y && add-apt-repos
 ADD https://deb.nodesource.com/setup_lts.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
 ADD https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb /tmp
-COPY dist/bzt*whl /tmp
+#COPY dist/bzt*whl /tmp
 
 WORKDIR /tmp
 RUN $APT_UPDATE && $APT_INSTALL \
