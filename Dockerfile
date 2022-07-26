@@ -3,7 +3,6 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 ENV APT_INSTALL="apt-get -y install --no-install-recommends"
-ENV SNAP_INSTALL="snap install"
 ENV APT_UPDATE="apt-get -y update"
 ENV PIP_INSTALL="python3 -m pip install"
 
@@ -15,6 +14,12 @@ ADD https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.d
 COPY dist/bzt*whl /tmp
 
 WORKDIR /tmp
+RUN $APT_UPDATE && $APT_INSTALL \
+    unzip software-properties-common apt-transport-https \
+    openjdk-11-jdk xvfb siege apache2-utils firefox ruby nodejs locales tsung
+
+RUN firefox --version
+
 # add node repo and call 'apt-get update'
 RUN bash ./setup_lts.x \
    && $APT_INSTALL build-essential python3-pip python3.9 python3.9-distutils
@@ -23,10 +28,6 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 
 # install python packages..
 RUN $PIP_INSTALL ./bzt*whl chardet
-
-RUN $APT_UPDATE && $APT_INSTALL \
-    unzip software-properties-common apt-transport-https \
-    openjdk-11-jdk xvfb siege apache2-utils firefox ruby nodejs locales tsung
 
 # set en_US.UTF-8 as default locale
 RUN locale-gen "en_US.UTF-8" \
@@ -66,6 +67,7 @@ RUN mkdir -p /etc/bzt.d \
   && google-chrome-stable --version && firefox --version && dotnet --version | head -1
 
 RUN rm -rf /tmp/* \
+  && rm -rf /var/lib/apt/lists/* \
   && mkdir /bzt-configs /tmp/artifacts
 
 WORKDIR /bzt-configs
