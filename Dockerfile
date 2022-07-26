@@ -4,13 +4,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 ENV APT_INSTALL="apt-get -y install --no-install-recommends"
 ENV APT_UPDATE="apt-get -y update"
-ENV PIP_INSTALL="python3.9 -m pip install"
+ENV PIP_INSTALL="python3 -m pip install"
 
 RUN apt-get update && apt install software-properties-common -y && add-apt-repository ppa:deadsnakes/ppa -y && apt-get update
 
 ADD https://deb.nodesource.com/setup_lts.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
 ADD https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb /tmp
+ADD http://ftp.debian.org/debian/pool/main/p/python3-stdlib-extensions/python3-distutils_3.9.2-1_all.deb /tmp
 COPY dist/bzt*whl /tmp
 
 WORKDIR /tmp
@@ -50,7 +51,10 @@ RUN wget -q "https://github.com/tsenart/vegeta/releases/download/v${VEGETA_VERSI
  && tar xzf /tmp/vegeta.tar.gz -C /bin \
  && rm /tmp/vegeta.tar.gz
 
-#RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+
+# Install python-distutils hack due to downgrading Python to 3.9 - https://stackoverflow.com/questions/61567990/how-to-install-python-distutils-for-old-python-versions/64278137#64278137
+RUN  $APT_INSTALL ./python3-distutils_3.9.2-1_all.deb
 
 # install python packages..
 RUN $PIP_INSTALL ./bzt*whl chardet
@@ -59,7 +63,7 @@ RUN $PIP_INSTALL ./bzt*whl chardet
 RUN mkdir -p /etc/bzt.d \
   && echo '{"install-id": "Docker"}' > /etc/bzt.d/99-zinstallID.json \
   && echo '{"settings": {"artifacts-dir": "/tmp/artifacts"}}' > /etc/bzt.d/90-artifacts-dir.json \
-  && cp `python3.9 -c "import bzt; print('{}/resources/chrome_launcher.sh'.format(bzt.__path__[0]))"` \
+  && cp `python3 -c "import bzt; print('{}/resources/chrome_launcher.sh'.format(bzt.__path__[0]))"` \
     /opt/google/chrome/google-chrome \
   && bzt -install-tools -v \
   && google-chrome-stable --version && firefox --version && dotnet --version | head -1
