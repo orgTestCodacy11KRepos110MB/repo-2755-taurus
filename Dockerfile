@@ -26,8 +26,7 @@ RUN $PIP_INSTALL ./bzt*whl chardet
 
 RUN $APT_UPDATE && $APT_INSTALL \
     unzip software-properties-common apt-transport-https \
-    openjdk-11-jdk xvfb siege apache2-utils ruby nodejs locales tsung
-RUN $SNAP_INSTALL firefox
+    openjdk-11-jdk xvfb siege apache2-utils firefoxs ruby nodejs locales tsung
 
 # set en_US.UTF-8 as default locale
 RUN locale-gen "en_US.UTF-8" \
