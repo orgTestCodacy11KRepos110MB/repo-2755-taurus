@@ -6,9 +6,7 @@ ENV APT_INSTALL="apt-get -y install --no-install-recommends"
 ENV APT_UPDATE="apt-get -y update"
 ENV PIP_INSTALL="python3 -m pip install"
 
-RUN $APT_UPDATE \
-    #add repositories
-    && $APT_INSTALL software-properties-common && add-apt-repository ppa:deadsnakes/ppa -y && add-apt-repository ppa:mozillateam/ppa -y
+RUN apt-get update && apt install software-properties-common -y && add-apt-repository ppa:deadsnakes/ppa -y && apt-get update
 
 ADD https://deb.nodesource.com/setup_lts.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
@@ -18,10 +16,7 @@ COPY dist/bzt*whl /tmp
 WORKDIR /tmp
 RUN $APT_UPDATE && $APT_INSTALL \
     unzip software-properties-common apt-transport-https \
-    openjdk-11-jdk xvfb siege apache2-utils ruby nodejs locales tsung \
-RUN apt install firefox
-
-RUN firefox --version
+    openjdk-11-jdk xvfb siege apache2-utils firefox ruby nodejs locales tsung
 
 # add node repo and call 'apt-get update'
 RUN bash ./setup_lts.x \
