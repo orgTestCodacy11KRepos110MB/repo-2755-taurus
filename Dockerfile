@@ -38,10 +38,12 @@ RUN $APT_INSTALL ./google-chrome-stable_current_amd64.deb \
   && mv /opt/google/chrome/google-chrome /opt/google/chrome/_google-chrome
 
 # Get .NET Core
-RUN $APT_INSTALL ./packages-microsoft-prod.deb \
-   # Update is required because packages-microsoft-prod.deb installation add repositories for dotnet
-   && $APT_UPDATE \
-   && $APT_INSTALL dotnet-sdk-3.1
+RUN  $APT_INSTALL ./packages-microsoft-prod.deb \
+# Update is required because packages-microsoft-prod.deb installation add repositories for dotnet
+    && $APT_UPDATE \
+    && $APT_INSTALL apt-transport-https \
+    && $APT_UPDATE \
+    && $APT_INSTALL dotnet-sdk-6.0
 
 # Install K6
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69 \
