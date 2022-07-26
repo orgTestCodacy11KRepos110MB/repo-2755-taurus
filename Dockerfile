@@ -16,7 +16,7 @@ COPY dist/bzt*whl /tmp
 WORKDIR /tmp
 RUN $APT_UPDATE && $APT_INSTALL \
     unzip software-properties-common apt-transport-https \
-    openjdk-11-jdk xvfb siege apache2-utils firefox ruby nodejs locales tsung
+    openjdk-11-jdk xvfb siege apache2-utils ruby nodejs locales tsung
 
 RUN firefox --version
 
