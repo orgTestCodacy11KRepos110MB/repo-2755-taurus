@@ -4,8 +4,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 ENV APT_INSTALL="apt-get -y install --no-install-recommends"
 ENV APT_UPDATE="apt-get -y update"
-ENV APT_ADD_REPO="add-apt-repository -y"
 ENV PIP_INSTALL="python3 -m pip install"
+
+RUN $APT_UPDATE \
+    #add repositories
+    && $APT_INSTALL software-properties-common && add-apt-repository ppa:deadsnakes/ppa -y && add-apt-repository ppa:mozillateam/ppa -y
 
 ADD https://deb.nodesource.com/setup_lts.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
@@ -13,15 +16,9 @@ ADD https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.d
 COPY dist/bzt*whl /tmp
 
 WORKDIR /tmp
-
-RUN $APT_UPDATE \
-    #add repositories
-    && $APT_INSTALL software-properties-common && $APT_ADD_REPO ppa:deadsnakes/ppa \
-    && $APT_UPDATE
-
 RUN $APT_UPDATE && $APT_INSTALL \
     unzip software-properties-common apt-transport-https \
-    openjdk-11-jdk xvfb siege apache2-utils firefox ruby nodejs locales tsung
+    openjdk-11-jdk xvfb siege apache2-utils ruby nodejs locales tsung
 
 RUN firefox --version
 
