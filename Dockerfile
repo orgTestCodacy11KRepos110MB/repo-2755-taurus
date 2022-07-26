@@ -11,13 +11,18 @@ RUN apt-get update && apt install software-properties-common -y && add-apt-repos
 ADD https://deb.nodesource.com/setup_lts.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
 ADD https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb /tmp
-ADD http://ftp.debian.org/debian/pool/main/p/python3-stdlib-extensions/python3-distutils_3.9.2-1_all.deb /tmp
+#ADD http://ftp.debian.org/debian/pool/main/p/python3-stdlib-extensions/python3-distutils_3.9.2-1_all.deb /tmp
 COPY dist/bzt*whl /tmp
 
 WORKDIR /tmp
 # add node repo and call 'apt-get update'
 RUN bash ./setup_lts.x \
-   && $APT_INSTALL build-essential python3-pip python3.9
+   && $APT_INSTALL build-essential python3-pip python3.9 python3.9-distutils
+
+# REMOVE install python packages..
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+RUN $PIP_INSTALL ./bzt*whl chardet
+
 
 RUN $APT_UPDATE && $APT_INSTALL \
     unzip software-properties-common apt-transport-https \
@@ -54,7 +59,7 @@ RUN wget -q "https://github.com/tsenart/vegeta/releases/download/v${VEGETA_VERSI
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 
 # Install python-distutils hack due to downgrading Python to 3.9 - https://stackoverflow.com/questions/61567990/how-to-install-python-distutils-for-old-python-versions/64278137#64278137
-RUN  $APT_INSTALL ./python3-distutils_3.9.2-1_all.deb
+#RUN  $APT_INSTALL ./python3-distutils_3.9.2-1_all.deb
 
 # install python packages..
 RUN $PIP_INSTALL ./bzt*whl chardet
