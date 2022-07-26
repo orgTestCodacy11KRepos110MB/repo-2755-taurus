@@ -16,7 +16,7 @@ WORKDIR /tmp
 
 RUN $APT_UPDATE \
     #add repositories
-    && $APT_INSTALL software-properties-common && $APT_ADD_REPO ppa:deadsnakes/ppa && $APT_ADD_REPO ppa:mozillateam/ppa \
+    && $APT_INSTALL software-properties-common && $APT_ADD_REPO ppa:deadsnakes/ppa \
     && $APT_UPDATE
 
 RUN $APT_UPDATE && $APT_INSTALL \
