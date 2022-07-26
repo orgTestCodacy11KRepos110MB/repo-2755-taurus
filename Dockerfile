@@ -18,9 +18,6 @@ WORKDIR /tmp
 RUN bash ./setup_lts.x \
    && $APT_INSTALL build-essential python3-pip python3.9
 
-# install python packages..
-RUN $PIP_INSTALL ./bzt*whl chardet
-
 RUN $APT_UPDATE && $APT_INSTALL \
     unzip software-properties-common apt-transport-https \
     openjdk-11-jdk xvfb siege apache2-utils firefox ruby nodejs locales tsung
@@ -57,6 +54,9 @@ RUN wget -q "https://github.com/tsenart/vegeta/releases/download/v${VEGETA_VERSI
 
 # auto installable tools
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+
+# install python packages..
+RUN $PIP_INSTALL ./bzt*whl chardet
 
 RUN mkdir -p /etc/bzt.d \
   && echo '{"install-id": "Docker"}' > /etc/bzt.d/99-zinstallID.json \
