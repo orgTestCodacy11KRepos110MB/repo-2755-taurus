@@ -6,17 +6,22 @@ ENV APT_INSTALL="apt-get -y install --no-install-recommends"
 ENV APT_UPDATE="apt-get -y update"
 ENV PIP_INSTALL="python3 -m pip install"
 
-RUN apt-get update && apt install software-properties-common -y && add-apt-repository ppa:deadsnakes/ppa -y && apt-get update
+
+RUN apt-get update && apt install software-properties-common -y && add-apt-repository ppa:deadsnakes/ppa -y && add-apt-repository ppa:mozillateam/ppa && apt-get update
+
+RUN $APT_INSTALL -t 'o=LP-PPA-mozillateam' firefox
 
 ADD https://deb.nodesource.com/setup_lts.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
 ADD https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb /tmp
-#COPY dist/bzt*whl /tmp
+COPY dist/bzt*whl /tmp
 
 WORKDIR /tmp
 RUN $APT_UPDATE && $APT_INSTALL \
     unzip software-properties-common apt-transport-https \
-    openjdk-11-jdk xvfb siege apache2-utils firefox ruby nodejs locales tsung
+    openjdk-11-jdk xvfb siege apache2-utils ruby nodejs locales tsung
+
+
 
 # add node repo and call 'apt-get update'
 RUN bash ./setup_lts.x \
