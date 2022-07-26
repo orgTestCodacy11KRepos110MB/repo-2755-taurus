@@ -3,6 +3,7 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 ENV APT_INSTALL="apt-get -y install --no-install-recommends"
+ENV SNAP_INSTALL="snap install"
 ENV APT_UPDATE="apt-get -y update"
 ENV PIP_INSTALL="python3 -m pip install"
 
@@ -25,7 +26,8 @@ RUN $PIP_INSTALL ./bzt*whl chardet
 
 RUN $APT_UPDATE && $APT_INSTALL \
     unzip software-properties-common apt-transport-https \
-    openjdk-11-jdk xvfb siege apache2-utils firefox ruby nodejs locales tsung
+    openjdk-11-jdk xvfb siege apache2-utils ruby nodejs locales tsung \
+RUN $SNAP_INSTALL firefox
 
 # set en_US.UTF-8 as default locale
 RUN locale-gen "en_US.UTF-8" \
