@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 ENV APT_INSTALL="apt-get -y install --no-install-recommends"
 ENV APT_UPDATE="apt-get -y update"
-ENV PIP_INSTALL="python3 -m pip install"
+ENV PIP_INSTALL="python3.9 -m pip install"
 
 RUN apt-get update && apt install software-properties-common -y && add-apt-repository ppa:deadsnakes/ppa -y && apt-get update
 
@@ -36,8 +36,6 @@ RUN $APT_INSTALL ./google-chrome-stable_current_amd64.deb \
 RUN  $APT_INSTALL ./packages-microsoft-prod.deb \
 # Update is required because packages-microsoft-prod.deb installation add repositories for dotnet
     && $APT_UPDATE \
-    && $APT_INSTALL apt-transport-https \
-    && $APT_UPDATE \
     && $APT_INSTALL dotnet-sdk-6.0
 
 # Install K6
@@ -52,16 +50,16 @@ RUN wget -q "https://github.com/tsenart/vegeta/releases/download/v${VEGETA_VERSI
  && tar xzf /tmp/vegeta.tar.gz -C /bin \
  && rm /tmp/vegeta.tar.gz
 
-# auto installable tools
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+#RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 
 # install python packages..
 RUN $PIP_INSTALL ./bzt*whl chardet
 
+# auto installable tools
 RUN mkdir -p /etc/bzt.d \
   && echo '{"install-id": "Docker"}' > /etc/bzt.d/99-zinstallID.json \
   && echo '{"settings": {"artifacts-dir": "/tmp/artifacts"}}' > /etc/bzt.d/90-artifacts-dir.json \
-  && cp `python3 -c "import bzt; print('{}/resources/chrome_launcher.sh'.format(bzt.__path__[0]))"` \
+  && cp `python3.9 -c "import bzt; print('{}/resources/chrome_launcher.sh'.format(bzt.__path__[0]))"` \
     /opt/google/chrome/google-chrome \
   && bzt -install-tools -v \
   && google-chrome-stable --version && firefox --version && dotnet --version | head -1
