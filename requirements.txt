@@ -1,16 +1,16 @@
 astunparse>=1.6.0
 colorama; sys_platform == 'win32'
 colorlog
-cssselect
+cssselect>=1.1.0
 Cython; python_version >= '3.9'
 fuzzyset2
 hdrpy>=0.3.3
-lxml>=4.6.2
+lxml>=4.9.1
 progressbar33
-psutil>=5.6.6
-pyvirtualdisplay; sys_platform != 'win32'
-pyyaml
-requests>=2.18.1
+psutil>=5.9.1
+pyvirtualdisplay>=3.0; sys_platform != 'win32'
+pyyaml>=6.0
+requests>=2.28.1
 urwid
 terminaltables>=3.1.0
 molotov!=2.3

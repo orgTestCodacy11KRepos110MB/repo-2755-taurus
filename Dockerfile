@@ -21,8 +21,6 @@ RUN $APT_UPDATE && $APT_INSTALL \
     unzip software-properties-common apt-transport-https \
     openjdk-11-jdk xvfb siege apache2-utils ruby nodejs locales tsung
 
-
-
 # add node repo and call 'apt-get update'
 RUN bash ./setup_lts.x \
    && $APT_INSTALL build-essential python3-pip python3.9 python3.9-distutils
@@ -31,6 +29,9 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 
 # install python packages..
 RUN $PIP_INSTALL ./bzt*whl chardet
+
+# Fix vulnerabilities / outdated versions
+RUN $PIP_INSTALL --user --upgrade pip pillow oauthlib pyjwt httplib2
 
 # set en_US.UTF-8 as default locale
 RUN locale-gen "en_US.UTF-8" \
