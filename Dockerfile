@@ -7,21 +7,18 @@ ENV APT_UPDATE="apt-get -y update"
 ENV APT_ADD_REPO="add-apt-repository -y"
 ENV PIP_INSTALL="python3 -m pip install"
 
-RUN snap remove --purge firefox
-
-RUN $APT_UPDATE \
-    #add repositories
-    && $APT_INSTALL software-properties-common && $APT_ADD_REPO ppa:deadsnakes/ppa && $APT_ADD_REPO ppa:mozillateam/ppa \
-    && $APT_UPDATE
-
-
-
 ADD https://deb.nodesource.com/setup_lts.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
 ADD https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb /tmp
 COPY dist/bzt*whl /tmp
 
 WORKDIR /tmp
+
+RUN $APT_UPDATE \
+    #add repositories
+    && $APT_INSTALL software-properties-common && $APT_ADD_REPO ppa:deadsnakes/ppa && $APT_ADD_REPO ppa:mozillateam/ppa \
+    && $APT_UPDATE
+
 RUN $APT_UPDATE && $APT_INSTALL \
     unzip software-properties-common apt-transport-https \
     openjdk-11-jdk xvfb siege apache2-utils firefox ruby nodejs locales tsung
