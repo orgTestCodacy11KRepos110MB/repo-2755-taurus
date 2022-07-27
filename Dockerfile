@@ -8,10 +8,6 @@ ENV APT_LIGHT_INSTALL="apt -y install"
 ENV APT_UPDATE="apt-get -y update"
 ENV PIP_INSTALL="python3 -m pip install"
 
-RUN $APT_UPDATE && $APT_LIGHT_INSTALL software-properties-common && $APT_ADD_REPO ppa:deadsnakes/ppa && add-apt-repository ppa:mozillateam/ppa && $APT_UPDATE
-
-RUN $APT_INSTALL -t 'o=LP-PPA-mozillateam' firefox
-
 ADD https://deb.nodesource.com/setup_lts.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
 ADD https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb /tmp
@@ -19,26 +15,28 @@ COPY dist/bzt*whl /tmp
 COPY requirements.txt /tmp
 
 WORKDIR /tmp
-RUN $APT_UPDATE && $APT_INSTALL \
-    unzip software-properties-common apt-transport-https \
-    openjdk-11-jdk xvfb siege apache2-utils ruby nodejs locales tsung
 
-# add node repo and call 'apt-get update'
+#Add repositories
+RUN $APT_UPDATE && $APT_LIGHT_INSTALL software-properties-common && $APT_ADD_REPO ppa:deadsnakes/ppa && add-apt-repository ppa:mozillateam/ppa && $APT_UPDATE
+
+#install system packages, Python 3.9 and set is as a default Python
 RUN bash ./setup_lts.x \
-   && $APT_INSTALL build-essential python3-pip python3.9 python3.9-distutils
+  && $APT_UPDATE && $APT_INSTALL \
+    unzip software-properties-common apt-transport-https \
+    openjdk-11-jdk xvfb siege apache2-utils ruby nodejs locales tsung \
+    nodejs build-essential python3-pip python3.9 python3.9-distutils \
+  #Firefox from PPA, not from Snap
+  && $APT_INSTALL -t 'o=LP-PPA-mozillateam' firefox
+  && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1 \
 
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
-RUN $PIP_INSTALL --upgrade --force-reinstall -r requirements.txt
-
-# install python packages..
-RUN $PIP_INSTALL ./bzt*whl chardet
-
-# Fix vulnerabilities / outdated versions
-RUN $PIP_INSTALL --user --upgrade pip pillow oauthlib pyjwt httplib2
+# Fix vulnerabilities / outdated versions, install python packages..
+  && $PIP_INSTALL --upgrade --force-reinstall -r requirements.txt \
+  && $PIP_INSTALL --user --upgrade pip pillow oauthlib pyjwt httplib2 \
+  && $PIP_INSTALL ./bzt*whl chardet
 
 # set en_US.UTF-8 as default locale
 RUN locale-gen "en_US.UTF-8" \
-   && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+  && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
 RUN gem install rspec rake selenium-webdriver
 
@@ -49,32 +47,34 @@ RUN $APT_INSTALL ./google-chrome-stable_current_amd64.deb \
 # Get .NET Core
 RUN  $APT_INSTALL ./packages-microsoft-prod.deb \
 # Update is required because packages-microsoft-prod.deb installation add repositories for dotnet
-    && $APT_UPDATE \
-    && $APT_INSTALL dotnet-sdk-6.0
+  && $APT_UPDATE \
+  && $APT_INSTALL dotnet-sdk-6.0
 
 # Install K6
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69 \
-   && echo "deb https://dl.k6.io/deb stable main" | tee /etc/apt/sources.list.d/k6.list \
-   && $APT_UPDATE \
-   && $APT_INSTALL k6
+  && echo "deb https://dl.k6.io/deb stable main" | tee /etc/apt/sources.list.d/k6.list \
+  && $APT_UPDATE \
+  && $APT_INSTALL k6
 
 # Install Vegeta
 ENV VEGETA_VERSION 12.8.4
 RUN wget -q "https://github.com/tsenart/vegeta/releases/download/v${VEGETA_VERSION}/vegeta_${VEGETA_VERSION}_linux_amd64.tar.gz" -O /tmp/vegeta.tar.gz \
- && tar xzf /tmp/vegeta.tar.gz -C /bin \
- && rm /tmp/vegeta.tar.gz
+  && tar xzf /tmp/vegeta.tar.gz -C /bin \
+  && rm /tmp/vegeta.tar.gz
 
 # auto installable tools
 RUN mkdir -p /etc/bzt.d \
   && echo '{"install-id": "Docker"}' > /etc/bzt.d/99-zinstallID.json \
   && echo '{"settings": {"artifacts-dir": "/tmp/artifacts"}}' > /etc/bzt.d/90-artifacts-dir.json \
   && cp `python3 -c "import bzt; print('{}/resources/chrome_launcher.sh'.format(bzt.__path__[0]))"` \
-    /opt/google/chrome/google-chrome
-RUN bzt -install-tools -v
-RUN google-chrome-stable --version && firefox --version && dotnet --version | head -1
+    /opt/google/chrome/google-chrome \
+  && bzt -install-tools -v \
+  && google-chrome-stable --version && firefox --version && dotnet --version | head -1
 
-
+# Cleanup
 RUN rm -rf /tmp/* \
+  && apt-get clean \
+  && apt-get autoremove --purge \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir /bzt-configs /tmp/artifacts
 
