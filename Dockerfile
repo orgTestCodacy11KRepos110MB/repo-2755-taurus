@@ -26,11 +26,11 @@ RUN bash ./setup_lts.x \
     openjdk-11-jdk xvfb siege apache2-utils ruby nodejs locales tsung \
     nodejs build-essential python3-pip python3.9 python3.9-distutils \
   #Firefox from PPA, not from Snap
-  && $APT_INSTALL -t 'o=LP-PPA-mozillateam' firefox
-  && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1 \
+  && $APT_INSTALL -t 'o=LP-PPA-mozillateam' firefox \
+  && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 
 # Fix vulnerabilities / outdated versions, install python packages..
-  && $PIP_INSTALL --upgrade --force-reinstall -r requirements.txt \
+RUN $PIP_INSTALL --upgrade --force-reinstall -r requirements.txt \
   && $PIP_INSTALL --user --upgrade pip pillow oauthlib pyjwt httplib2 \
   && $PIP_INSTALL ./bzt*whl chardet
 
@@ -45,7 +45,7 @@ RUN $APT_INSTALL ./google-chrome-stable_current_amd64.deb \
   && mv /opt/google/chrome/google-chrome /opt/google/chrome/_google-chrome
 
 # Get .NET Core
-RUN  $APT_INSTALL ./packages-microsoft-prod.deb \
+RUN $APT_INSTALL ./packages-microsoft-prod.deb \
 # Update is required because packages-microsoft-prod.deb installation add repositories for dotnet
   && $APT_UPDATE \
   && $APT_INSTALL dotnet-sdk-6.0
