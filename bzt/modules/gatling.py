@@ -702,7 +702,7 @@ class Gatling(RequiredTool):
     """
     DOWNLOAD_LINK = "https://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts-bundle" \
                     "/{version}/gatling-charts-highcharts-bundle-{version}-bundle.zip"
-    VERSION = "3.7.6"
+    VERSION = "3.8.3"
     LOCAL_PATH = "~/.bzt/gatling-taurus/{version}/bin/gatling{suffix}"
 
     def __init__(self, config=None, **kwargs):
@@ -761,6 +761,8 @@ class Gatling(RequiredTool):
                         mod_success = True
                         line = line.rstrip()[:-1] + '${JAVA_CLASSPATH}"\n'  # add from env
                     elif line.startswith('"$JAVA"'):
+                        line = line.rstrip() + ' -rm=local -rd="Taurus"\n'  # add from env
+                        mod_success = True
                         line = 'eval ' + line
                 modified_lines.append(line)
 
