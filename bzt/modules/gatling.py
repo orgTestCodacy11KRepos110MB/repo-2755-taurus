@@ -764,8 +764,8 @@ class Gatling(RequiredTool):
                         mod_success = True
                         line = line.rstrip()[:-1] + ':${JAVA_CLASSPATH}"\n'  # add from env
                     elif line.startswith('"$JAVA"'):
-                        line = line.replace("$JAVA_OPTS", "")
-                        line = line.rstrip() + ' -rm local -rd Taurus -erjo "$JAVA_OPTS"\n'  # add from env
+                        line = line.replace("$JAVA_OPTS", "\"$JAVA_OPTS\"")
+                        line = line.rstrip() + ' -rm local -rd Taurus"\n'  # add from env
                         mod_success = True
                         line = 'eval ' + line
                         modified_lines.append('echo "*****************************"\n')
