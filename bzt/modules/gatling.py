@@ -760,6 +760,9 @@ class Gatling(RequiredTool):
                     elif line.startswith('GATLING_CLASSPATH='):
                         mod_success = True
                         line = line.rstrip()[:-1] + '${JAVA_CLASSPATH}"\n'  # add from env
+                    elif line.startswith('CLASSPATH='):
+                        mod_success = True
+                        line = line.rstrip()[:-1] + '${JAVA_CLASSPATH}"\n'  # add from env
                     elif line.startswith('"$JAVA"'):
                         line = line.rstrip() + ' -rm=local -rd="Taurus"\n'  # add from env
                         mod_success = True
