@@ -767,6 +767,12 @@ class Gatling(RequiredTool):
                         line = line.rstrip() + ' -rm local -rd Taurus\n'  # add from env
                         mod_success = True
                         line = 'eval ' + line
+                        modified_lines.append('echo "*****************************"\n')
+                        modified_lines.append('echo "java:" $JAVA\n')
+                        modified_lines.append('echo "java opts: " $JAVA_OPTS\n')
+                        modified_lines.append('echo "classpath:" $CLASSPATH\n')
+                        modified_lines.append('echo eval ' + line)
+                        modified_lines.append('echo "*****************************"\n')
                 modified_lines.append(line)
 
         if not mod_success:
