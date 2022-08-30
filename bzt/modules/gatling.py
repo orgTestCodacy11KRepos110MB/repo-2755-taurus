@@ -307,6 +307,7 @@ class GatlingExecutor(ScenarioExecutor):
         self.script = self.get_script_path()
         if not self.script:
             if "requests" in scenario:
+                self.log.info("ZLOG requests")
                 self.get_scenario()['simulation'], self.script = self.__generate_script()
             else:
                 msg = "There must be a script file or requests for its generation "
@@ -314,7 +315,7 @@ class GatlingExecutor(ScenarioExecutor):
                 raise TaurusConfigError(msg)
 
         self.dir_prefix = self.settings.get("dir-prefix", self.dir_prefix)
-
+        self.log.info("ZLOG dirprefix " + dir_prefix)
         self.stdout = open(self.engine.create_artifact("gatling", ".out"), "w")
         self.stderr = open(self.engine.create_artifact("gatling", ".err"), "w")
 
@@ -328,7 +329,7 @@ class GatlingExecutor(ScenarioExecutor):
         gen_script = GatlingScriptBuilder(self.get_load(), self.get_scenario(), self.log, simulation, self.tool.version)
         with codecs.open(file_name, 'w', encoding='utf-8') as script:
             script.write(gen_script.gen_test_case())
-
+        self.log.info("ZLOG Generating simulation class " + file_name)
         return simulation, file_name
 
     def _get_simulation_props(self):
