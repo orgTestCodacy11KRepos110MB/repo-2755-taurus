@@ -315,7 +315,7 @@ class GatlingExecutor(ScenarioExecutor):
                 raise TaurusConfigError(msg)
 
         self.dir_prefix = self.settings.get("dir-prefix", self.dir_prefix)
-        self.log.info("ZLOG dirprefix " + dir_prefix)
+        self.log.info("ZLOG dirprefix " + self.dir_prefix)
         self.stdout = open(self.engine.create_artifact("gatling", ".out"), "w")
         self.stderr = open(self.engine.create_artifact("gatling", ".err"), "w")
 
