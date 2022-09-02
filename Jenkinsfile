@@ -2,7 +2,7 @@
 
 pipeline {
     agent {
-        dockerfile {
+        docker {
             label 'google'
             //builder image built bu test/ci/Dockerfile
             image 'us.gcr.io/verdant-bulwark-278/jenkins-docker-agent:taurus-agent-1'
