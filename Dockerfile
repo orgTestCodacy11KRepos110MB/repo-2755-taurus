@@ -12,14 +12,14 @@ ENV PIP_INSTALL="python3 -m pip install"
 
 ADD https://deb.nodesource.com/setup_14.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
-ADD https://packages.microsoft.com/config/ubuntu/21.04/packages-microsoft-prod.deb /tmp
+ADD https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb /tmp
 COPY dist/bzt*whl /tmp
 
 WORKDIR /tmp
 # add node repo and call 'apt-get update'
-RUN bash ./setup_14.x && $APT_INSTALL build-essential python3-pip python3.9-dev net-tools apt-utils
+RUN bash ./setup_14.x && $APT_INSTALL build-essential python3-pip python3.10-dev net-tools apt-utils
 
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
 
 # install python packages..
 RUN $PIP_INSTALL ./bzt*whl chardet
@@ -34,11 +34,8 @@ RUN $APT_UPDATE && $APT_INSTALL \
 # set en_US.UTF-8 as default locale
 RUN locale-gen "en_US.UTF-8" && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
-# Force cgi version to fix CVE-2021-41816
-RUN gem install rspec rake selenium-webdriver cgi:0.1.1 && gem update bundler date && gem cleanup \
-    && rm /usr/lib/ruby/gems/2.7.0/specifications/default/cgi-0.1.0.gemspec \
-    && rm /usr/lib/ruby/gems/2.7.0/specifications/default/bundler-2.1.4.gemspec \
-    && rm /usr/lib/ruby/gems/2.7.0/specifications/default/date-3.0.0.gemspec
+# Force cgi version to fix CVE-2021-41816 -> updated to 0.2.0
+RUN gem install rspec rake selenium-webdriver cgi:0.1.1 && gem update bundler date && gem cleanup
 
 # Get Google Chrome
 RUN $APT_INSTALL ./google-chrome-stable_current_amd64.deb \
@@ -48,28 +45,28 @@ RUN $APT_INSTALL ./google-chrome-stable_current_amd64.deb \
 RUN $APT_INSTALL ./packages-microsoft-prod.deb \
    # Update is required because packages-microsoft-prod.deb installation add repositories for dotnet
    && $APT_UPDATE \
-   && $APT_INSTALL dotnet-sdk-3.1
+   && $APT_INSTALL dotnet-sdk-6.0
 
 # Install K6
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69 \
-   && echo "deb https://dl.k6.io/deb stable main" | tee /etc/apt/sources.list.d/k6.list \
-   && $APT_UPDATE \
-   && $APT_INSTALL k6
+#RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69 \
+#   && echo "deb https://dl.k6.io/deb stable main" | tee /etc/apt/sources.list.d/k6.list \
+#   && $APT_UPDATE \
+#   && $APT_INSTALL k6
 
 # auto installable tools
-RUN mkdir -p /etc/bzt.d \
-  && echo '{"install-id": "Docker"}' > /etc/bzt.d/99-zinstallID.json \
-  && echo '{"settings": {"artifacts-dir": "/tmp/artifacts"}}' > /etc/bzt.d/90-artifacts-dir.json \
-  && cp `python3 -c "import bzt; print('{}/resources/chrome_launcher.sh'.format(bzt.__path__[0]))"` \
-    /opt/google/chrome/google-chrome \
-  && bzt -install-tools -v \
-  && google-chrome-stable --version && firefox --version && dotnet --version | head -1
+#RUN mkdir -p /etc/bzt.d \
+#  && echo '{"install-id": "Docker"}' > /etc/bzt.d/99-zinstallID.json \
+#  && echo '{"settings": {"artifacts-dir": "/tmp/artifacts"}}' > /etc/bzt.d/90-artifacts-dir.json \
+#  && cp `python3 -c "import bzt; print('{}/resources/chrome_launcher.sh'.format(bzt.__path__[0]))"` \
+#    /opt/google/chrome/google-chrome \
+#  && bzt -install-tools -v \
+#  && google-chrome-stable --version && firefox --version && dotnet --version | head -1
 
-# Fix npm vulnerabilites
-WORKDIR /root/.bzt/selenium-taurus/wdio/node_modules/recursive-readdir
-RUN sed -i 's/3.0.4/3.0.8/g' package.json && npm update && npm install -g npm@latest && npm -g update
-
-RUN rm -rf /usr/share/javascript/jquery && rm -rf /usr/share/javascript/jquery-ui && rm -rf /tmp/* && mkdir /bzt-configs /tmp/artifacts
+## Fix npm vulnerabilites
+#WORKDIR /root/.bzt/selenium-taurus/wdio/node_modules/recursive-readdir
+#RUN sed -i 's/3.0.4/3.0.8/g' package.json && npm update && npm install -g npm@latest && npm -g update
+#
+#RUN rm -rf /usr/share/javascript/jquery && rm -rf /usr/share/javascript/jquery-ui && rm -rf /tmp/* && mkdir /bzt-configs /tmp/artifacts
 
 # Rootless user
 # USER 1337:0
