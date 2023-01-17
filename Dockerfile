@@ -12,7 +12,6 @@ ENV PIP_INSTALL="python3 -m pip install"
 
 ADD https://deb.nodesource.com/setup_14.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
-ADD https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb /tmp
 COPY dist/bzt*whl /tmp
 
 WORKDIR /tmp
@@ -42,7 +41,7 @@ RUN $APT_INSTALL ./google-chrome-stable_current_amd64.deb \
   && mv /opt/google/chrome/google-chrome /opt/google/chrome/_google-chrome
 
 # Get .NET Core
-RUN $APT_INSTALL ./packages-microsoft-prod.deb \
+RUN printf '%s\n' 'Package: *' 'Pin: origin "packages.microsoft.com"' 'Pin-Priority: 1001' > /etc/apt/preferences.d/99microsoft-dotnet.pref \
    # Update is required because packages-microsoft-prod.deb installation add repositories for dotnet
    && $APT_UPDATE \
    && $APT_INSTALL dotnet-sdk-6.0
@@ -54,13 +53,13 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747
    && $APT_INSTALL k6
 
 # auto installable tools
-#RUN mkdir -p /etc/bzt.d \
-#  && echo '{"install-id": "Docker"}' > /etc/bzt.d/99-zinstallID.json \
-#  && echo '{"settings": {"artifacts-dir": "/tmp/artifacts"}}' > /etc/bzt.d/90-artifacts-dir.json \
-#  && cp `python3 -c "import bzt; print('{}/resources/chrome_launcher.sh'.format(bzt.__path__[0]))"` \
-#    /opt/google/chrome/google-chrome \
-#  && bzt -install-tools -v \
-#  && google-chrome-stable --version && firefox --version && dotnet --version | head -1
+RUN mkdir -p /etc/bzt.d \
+  && echo '{"install-id": "Docker"}' > /etc/bzt.d/99-zinstallID.json \
+  && echo '{"settings": {"artifacts-dir": "/tmp/artifacts"}}' > /etc/bzt.d/90-artifacts-dir.json \
+  && cp `python3 -c "import bzt; print('{}/resources/chrome_launcher.sh'.format(bzt.__path__[0]))"` \
+    /opt/google/chrome/google-chrome \
+  && bzt -install-tools -v \
+  && google-chrome-stable --version && firefox --version && dotnet --version | head -1
 
 ## Fix npm vulnerabilites
 #WORKDIR /root/.bzt/selenium-taurus/wdio/node_modules/recursive-readdir
