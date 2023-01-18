@@ -74,6 +74,6 @@ RUN sed -i 's/3.0.4/3.0.8/g' package.json && npm update && npm install -g npm@la
 RUN rm -rf /usr/share/javascript/jquery && rm -rf /usr/share/javascript/jquery-ui && rm -rf /tmp/* && mkdir /bzt-configs /tmp/artifacts
 
 # Rootless user
-USER 1337:0
+# USER 1337:0
 WORKDIR /bzt-configs
 ENTRYPOINT ["sh", "-c", "bzt -l /tmp/artifacts/bzt.log \"$@\"", "ignored"]
