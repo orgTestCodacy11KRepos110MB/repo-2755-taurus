@@ -28,7 +28,13 @@ RUN $PIP_INSTALL --user --upgrade pip pillow oauthlib pyjwt httplib2 numpy
 
 RUN $APT_UPDATE && $APT_INSTALL \
     unzip software-properties-common apt-transport-https \
-    openjdk-11-jdk xvfb siege apache2-utils firefox ruby ruby-dev make nodejs locales tsung
+    openjdk-11-jdk xvfb siege apache2-utils ruby ruby-dev make nodejs locales tsung
+
+# firefox repo - do not use snap
+RUN printf '%s\n' 'Package: firefox*' 'Pin: release o=Ubuntu*' 'Pin-Priority: -1' > /etc/apt/preferences.d/firefox-no-snap
+RUN add-apt-repository ppa:mozillateam/ppa
+
+RUN $APT_UPDATE && $APT_INSTALL firefox
 
 # set en_US.UTF-8 as default locale
 RUN locale-gen "en_US.UTF-8" && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
@@ -59,8 +65,7 @@ RUN mkdir -p /etc/bzt.d \
   && cp `python3 -c "import bzt; print('{}/resources/chrome_launcher.sh'.format(bzt.__path__[0]))"` \
     /opt/google/chrome/google-chrome \
   && bzt -install-tools -v \
-#  && google-chrome-stable --version && firefox --version && dotnet --version | head -1
-  && google-chrome-stable --version && dotnet --version | head -1
+  && google-chrome-stable --version && firefox --version && dotnet --version | head -1
 
 ## Fix npm vulnerabilites
 #WORKDIR /root/.bzt/selenium-taurus/wdio/node_modules/recursive-readdir
