@@ -68,8 +68,8 @@ RUN mkdir -p /etc/bzt.d \
   && google-chrome-stable --version && firefox --version && dotnet --version | head -1
 
 ## Fix npm vulnerabilites
-#WORKDIR /root/.bzt/selenium-taurus/wdio/node_modules/recursive-readdir
-#RUN sed -i 's/3.0.4/3.0.8/g' package.json && npm update && npm install -g npm@latest && npm -g update
+WORKDIR /root/.bzt/selenium-taurus/wdio/node_modules/recursive-readdir
+RUN sed -i 's/3.0.4/3.0.8/g' package.json && npm update && npm install -g npm@latest && npm -g update
 #
 #RUN rm -rf /usr/share/javascript/jquery && rm -rf /usr/share/javascript/jquery-ui && rm -rf /tmp/* && mkdir /bzt-configs /tmp/artifacts
 
