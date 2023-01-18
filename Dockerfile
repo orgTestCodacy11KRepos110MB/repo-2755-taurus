@@ -59,7 +59,8 @@ RUN mkdir -p /etc/bzt.d \
   && cp `python3 -c "import bzt; print('{}/resources/chrome_launcher.sh'.format(bzt.__path__[0]))"` \
     /opt/google/chrome/google-chrome \
   && bzt -install-tools -v \
-  && google-chrome-stable --version && firefox --version && dotnet --version | head -1
+#  && google-chrome-stable --version && firefox --version && dotnet --version | head -1
+  && google-chrome-stable --version && dotnet --version | head -1
 
 ## Fix npm vulnerabilites
 #WORKDIR /root/.bzt/selenium-taurus/wdio/node_modules/recursive-readdir
