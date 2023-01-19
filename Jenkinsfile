@@ -63,7 +63,7 @@ pipeline {
         stage("Integration Tests") {
             steps {
                 sh """
-                   docker run -v `pwd`:/bzt-configs -v `pwd`/integr-artifacts:/tmp/artifacts ${JOB_NAME.toLowerCase()} --memory 1024mb --shm-size 2g -sequential -examples/all-executors.yml
+                   docker run --memory 1024mb --shm-size 2g -v `pwd`:/bzt-configs -v `pwd`/integr-artifacts:/tmp/artifacts ${JOB_NAME.toLowerCase()} -sequential -examples/all-executors.yml
                    """
             }
         }
