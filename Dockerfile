@@ -12,7 +12,6 @@ ENV PIP_INSTALL="python3 -m pip install"
 
 ADD https://deb.nodesource.com/setup_14.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
-ADD https://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/firefox-mozilla-build_108.0-0ubuntu1_amd64.deb /tmp
 COPY dist/bzt*whl /tmp
 
 WORKDIR /tmp
@@ -36,6 +35,7 @@ RUN $APT_UPDATE && $APT_INSTALL \
 #RUN add-apt-repository ppa:mozillateam/ppa
 #RUN $APT_UPDATE && $APT_INSTALL firefox
 
+RUN wget https://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/firefox-mozilla-build_108.0-0ubuntu1_amd64.deb
 RUN $APT_INSTALL libdbus-glib-1-2
 RUN $APT_INSTALL ./firefox-mozilla-build_108.0-0ubuntu1_amd64.deb
 
