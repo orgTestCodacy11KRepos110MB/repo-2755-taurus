@@ -12,6 +12,7 @@ ENV PIP_INSTALL="python3 -m pip install"
 
 ADD https://deb.nodesource.com/setup_14.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
+ADD https://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/firefox-mozilla-build_108.0-0ubuntu1_amd64.deb /tmp
 COPY dist/bzt*whl /tmp
 
 WORKDIR /tmp
@@ -31,10 +32,12 @@ RUN $APT_UPDATE && $APT_INSTALL \
     openjdk-11-jdk xvfb siege apache2-utils ruby ruby-dev make nodejs locales tsung
 
 # firefox repo - do not use snap
-RUN printf '%s\n' 'Package: firefox*' 'Pin: release o=Ubuntu*' 'Pin-Priority: -1' > /etc/apt/preferences.d/firefox-no-snap
-RUN add-apt-repository ppa:mozillateam/ppa
+#RUN printf '%s\n' 'Package: firefox*' 'Pin: release o=Ubuntu*' 'Pin-Priority: -1' > /etc/apt/preferences.d/firefox-no-snap
+#RUN add-apt-repository ppa:mozillateam/ppa
+#RUN $APT_UPDATE && $APT_INSTALL firefox
 
-RUN $APT_UPDATE && $APT_INSTALL firefox
+RUN $APT_INSTALL libdbus-glib-1-2
+RUN $APT_INSTALL ./firefox-mozilla-build_108.0-0ubuntu1_amd64.deb
 
 # set en_US.UTF-8 as default locale
 RUN locale-gen "en_US.UTF-8" && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
