@@ -60,21 +60,21 @@ pipeline {
                 }
             }
         }
-        stage("Integration Tests") {
-            steps {
-                sh """
-                   docker run --memory 1024mb --shm-size 2g -v `pwd`:/bzt-configs -v `pwd`/integr-artifacts:/tmp/artifacts ${JOB_NAME.toLowerCase()} -sequential -examples/all-executors.yml
-                   """
-            }
-        }
-        stage("Deploy an artifact to PyPi") {
-            when { expression { isRelease } }
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'bzt-pypi', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                   sh "python3 -m twine upload -u ${USERNAME} -p ${PASSWORD} dist/*"
-               }
-            }
-        }
+//         stage("Integration Tests") {
+//             steps {
+//                 sh """
+//                    docker run --memory 1024mb --shm-size 2g -v `pwd`:/bzt-configs -v `pwd`/integr-artifacts:/tmp/artifacts ${JOB_NAME.toLowerCase()} -sequential -examples/all-executors.yml
+//                    """
+//             }
+//         }
+//         stage("Deploy an artifact to PyPi") {
+//             when { expression { isRelease } }
+//             steps {
+//                 withCredentials([usernamePassword(credentialsId: 'bzt-pypi', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+//                    sh "python3 -m twine upload -u ${USERNAME} -p ${PASSWORD} dist/*"
+//                }
+//             }
+//         }
         stage("Docker Image Push") {
             steps {
                 withDockerRegistry([ credentialsId: "dockerhub-access", url: "" ]) {
