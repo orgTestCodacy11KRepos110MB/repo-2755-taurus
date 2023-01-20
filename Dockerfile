@@ -43,7 +43,8 @@ RUN $APT_UPDATE && $APT_INSTALL \
 #RUN $APT_UPDATE && $APT_INSTALL firefox
 
 RUN $APT_INSTALL wget
-RUN wget --no-check-certificate https://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/firefox-mozilla-build_108.0-0ubuntu1_amd64.deb
+#RUN wget --no-check-certificate https://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/firefox-mozilla-build_108.0-0ubuntu1_amd64.deb
+RUN wget --no-check-certificate https://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/firefox-mozilla-build_105.0.2-0ubuntu1_amd64.deb
 RUN $APT_INSTALL libdbus-glib-1-2
 RUN $APT_INSTALL ./firefox-mozilla-build_108.0-0ubuntu1_amd64.deb
 
