@@ -337,6 +337,8 @@ class GeckoDriver(WebDriver):
         "https://github.com/mozilla/geckodriver/releases/download/v{version}/geckodriver-v{version}-{arch}.{ext}"
 
     def _get_latest_version_from_inet(self):
+        rsp = requests.get("https://api.github.com/repos/mozilla/geckodriver/releases/latest").json
+        self.log.info("gecko latest info:  %s", rsp)
         return requests.get("https://api.github.com/repos/mozilla/geckodriver/releases/latest").json()["name"]
 
     def _expand_download_link(self):
