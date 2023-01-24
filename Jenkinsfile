@@ -60,13 +60,13 @@ pipeline {
 //                 }
 //             }
 //         }
-//         stage("Integration Tests") {
-//             steps {
-//                 sh """
-//                    docker run -v `pwd`:/bzt-configs -v `pwd`/integr-artifacts:/tmp/artifacts ${JOB_NAME.toLowerCase()} -sequential examples/all-executors.yml
-//                    """
-//             }
-//         }
+        stage("Integration Tests") {
+            steps {
+                sh """
+                   docker run -v `pwd`:/bzt-configs -v `pwd`/integr-artifacts:/tmp/artifacts ${JOB_NAME.toLowerCase()} -sequential examples/all-executors.yml
+                   """
+            }
+        }
 //         stage("Deploy an artifact to PyPi") {
 //             when { expression { isRelease } }
 //             steps {
