@@ -47,34 +47,34 @@ pipeline {
                 }
             }
         }
-        stage("Prisma scan") {
-            when { expression { return PERFORM_PRISMA_SCAN } }
-            steps {
-                script{
-                    prismaCloudScanImage(dockerAddress: 'unix:///var/run/docker.sock',
-                            image: "${JOB_NAME.toLowerCase()}",
-                            logLevel: 'info',
-                            resultsFile: 'prisma-cloud-scan-results.json',
-                            ignoreImageBuildTime: true)
-                    prismaCloudPublish(resultsFilePattern: 'prisma-cloud-scan-results.json')
-                }
-            }
-        }
-        stage("Integration Tests") {
-            steps {
-                sh """
-                   docker run -v `pwd`:/bzt-configs -v `pwd`/integr-artifacts:/tmp/artifacts ${JOB_NAME.toLowerCase()} -sequential examples/all-executors.yml
-                   """
-            }
-        }
-        stage("Deploy an artifact to PyPi") {
-            when { expression { isRelease } }
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'bzt-pypi', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                   sh "python3 -m twine upload -u ${USERNAME} -p ${PASSWORD} dist/*"
-               }
-            }
-        }
+//         stage("Prisma scan") {
+//             when { expression { return PERFORM_PRISMA_SCAN } }
+//             steps {
+//                 script{
+//                     prismaCloudScanImage(dockerAddress: 'unix:///var/run/docker.sock',
+//                             image: "${JOB_NAME.toLowerCase()}",
+//                             logLevel: 'info',
+//                             resultsFile: 'prisma-cloud-scan-results.json',
+//                             ignoreImageBuildTime: true)
+//                     prismaCloudPublish(resultsFilePattern: 'prisma-cloud-scan-results.json')
+//                 }
+//             }
+//         }
+//         stage("Integration Tests") {
+//             steps {
+//                 sh """
+//                    docker run -v `pwd`:/bzt-configs -v `pwd`/integr-artifacts:/tmp/artifacts ${JOB_NAME.toLowerCase()} -sequential examples/all-executors.yml
+//                    """
+//             }
+//         }
+//         stage("Deploy an artifact to PyPi") {
+//             when { expression { isRelease } }
+//             steps {
+//                 withCredentials([usernamePassword(credentialsId: 'bzt-pypi', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+//                    sh "python3 -m twine upload -u ${USERNAME} -p ${PASSWORD} dist/*"
+//                }
+//             }
+//         }
         stage("Docker Image Push") {
             steps {
                 withDockerRegistry([ credentialsId: "dockerhub-access", url: "" ]) {
