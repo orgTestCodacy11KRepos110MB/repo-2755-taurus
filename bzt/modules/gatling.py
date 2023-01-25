@@ -307,7 +307,6 @@ class GatlingExecutor(ScenarioExecutor):
         self.script = self.get_script_path()
         if not self.script:
             if "requests" in scenario:
-                self.log.info("ZLOG requests")
                 self.get_scenario()['simulation'], self.script = self.__generate_script()
             else:
                 msg = "There must be a script file or requests for its generation "
@@ -315,7 +314,7 @@ class GatlingExecutor(ScenarioExecutor):
                 raise TaurusConfigError(msg)
 
         self.dir_prefix = self.settings.get("dir-prefix", self.dir_prefix)
-        self.log.info("ZLOG dirprefix " + self.dir_prefix)
+
         self.stdout = open(self.engine.create_artifact("gatling", ".out"), "w")
         self.stderr = open(self.engine.create_artifact("gatling", ".err"), "w")
 
@@ -329,7 +328,7 @@ class GatlingExecutor(ScenarioExecutor):
         gen_script = GatlingScriptBuilder(self.get_load(), self.get_scenario(), self.log, simulation, self.tool.version)
         with codecs.open(file_name, 'w', encoding='utf-8') as script:
             script.write(gen_script.gen_test_case())
-        self.log.info("ZLOG Generating simulation class " + file_name)
+
         return simulation, file_name
 
     def _get_simulation_props(self):
@@ -703,8 +702,7 @@ class Gatling(RequiredTool):
     """
     DOWNLOAD_LINK = "https://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts-bundle" \
                     "/{version}/gatling-charts-highcharts-bundle-{version}-bundle.zip"
-    VERSION = "3.8.3"
-#    VERSION = "3.7.6"
+    VERSION = "3.7.6"
     LOCAL_PATH = "~/.bzt/gatling-taurus/{version}/bin/gatling{suffix}"
 
     def __init__(self, config=None, **kwargs):
@@ -762,20 +760,8 @@ class Gatling(RequiredTool):
                     elif line.startswith('GATLING_CLASSPATH='):
                         mod_success = True
                         line = line.rstrip()[:-1] + '${JAVA_CLASSPATH}"\n'  # add from env
-                    elif line.startswith('CLASSPATH='):
-                        mod_success = True
-                        line = line.rstrip()[:-1] + ':${JAVA_CLASSPATH}"\n'  # add from env
                     elif line.startswith('"$JAVA"'):
-                        line = line.replace("$JAVA_OPTS", "\"$JAVA_OPTS\"")
-                        line = line.rstrip() + ' -rm local -rd Taurus"\n'  # add from env
-                        mod_success = True
                         line = 'eval ' + line
-                        modified_lines.append('echo "*****************************"\n')
-                        modified_lines.append('echo "java:" $JAVA\n')
-                        modified_lines.append('echo "java opts: " $JAVA_OPTS\n')
-                        modified_lines.append('echo "classpath:" $CLASSPATH\n')
-                        modified_lines.append('echo eval ' + line)
-                        modified_lines.append('echo "*****************************"\n')
                 modified_lines.append(line)
 
         if not mod_success:
