@@ -3,7 +3,7 @@
 pipeline {
     agent {
         docker {
-            label 'google'
+            label 'LinuxDockerPool'
             //builder image built bu test/ci/Dockerfile
             image 'us.gcr.io/verdant-bulwark-278/jenkins-docker-agent:taurus-agent-1'
             args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
