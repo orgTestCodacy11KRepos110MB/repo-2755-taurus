@@ -57,13 +57,13 @@ execution:
 
 ---
 execution:
-#- executor: selenium  # Selenium Ruby
-#  concurrency: 1
-#  hold-for: 10s
-#  iterations: 10
-#  scenario:
-#    script: selenium/rspec_example.rb
-#
+- executor: selenium  # Selenium Ruby
+  concurrency: 1
+  hold-for: 10s
+  iterations: 10
+  scenario:
+    script: selenium/rspec_example.rb
+
 - executor: selenium  # Selenium Mocha
   concurrency: 1
   hold-for: 10s
