@@ -12,6 +12,8 @@ ENV PIP_INSTALL="python3 -m pip install"
 
 ADD https://deb.nodesource.com/setup_14.x /tmp
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb /tmp
+ADD https://packages.microsoft.com/config/ubuntu/21.04/packages-microsoft-prod.deb /tmp
+ADD http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb /tmp
 COPY dist/bzt*whl /tmp
 
 WORKDIR /tmp
@@ -59,10 +61,15 @@ RUN $APT_INSTALL ./google-chrome-stable_current_amd64.deb \
   && mv /opt/google/chrome/google-chrome /opt/google/chrome/_google-chrome
 
 # Get .NET Core
-RUN printf '%s\n' 'Package: *' 'Pin: origin "packages.microsoft.com"' 'Pin-Priority: 1001' > /etc/apt/preferences.d/99microsoft-dotnet.pref \
+#RUN printf '%s\n' 'Package: *' 'Pin: origin "packages.microsoft.com"' 'Pin-Priority: 1001' > /etc/apt/preferences.d/99microsoft-dotnet.pref \
+#    Update is required because packages-microsoft-prod.deb installation add repositories for dotnet
+#   && $APT_UPDATE \
+#   && $APT_INSTALL dotnet-sdk-6.0
+RUN dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+RUN $APT_INSTALL ./packages-microsoft-prod.deb \
    # Update is required because packages-microsoft-prod.deb installation add repositories for dotnet
    && $APT_UPDATE \
-   && $APT_INSTALL dotnet-sdk-6.0
+   && $APT_INSTALL dotnet-sdk-3.1
 
 # Install K6
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69 \
